@@ -50,7 +50,8 @@ defmodule Fw.MixProject do
       {:shoehorn, "~> 0.4"},
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
-      {:slacking, in_umbrella: true}
+      {:slacking, in_umbrella: true},
+      {:wifi, in_umbrella: true}
     ] ++ deps(@target)
   end
 

@@ -17,7 +17,7 @@ defmodule Slacking.MixProject do
 
   def application do
     [
-      extra_applications: [:logger],
+      extra_applications: [:logger, :poison],
       mod: {Slacking.Application, []}
     ]
   end
