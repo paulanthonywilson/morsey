@@ -49,7 +49,8 @@ defmodule Fw.MixProject do
       {:nerves, "~> 1.3", runtime: false},
       {:shoehorn, "~> 0.4"},
       {:ring_logger, "~> 0.6"},
-      {:toolshed, "~> 0.2"}
+      {:toolshed, "~> 0.2"},
+      {:slacking, in_umbrella: true}
     ] ++ deps(@target)
   end
 
