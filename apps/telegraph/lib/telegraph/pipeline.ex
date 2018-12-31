@@ -5,7 +5,7 @@ defmodule Telegraph.Pipeline do
   """
   use GenServer
 
-  alias Telegraph.{GpioKey, Debounce, DotDash}
+  alias Telegraph.{GpioKey, Debounce, DotDash, GroupIntoCharacters}
 
   @name __MODULE__
 
@@ -14,7 +14,8 @@ defmodule Telegraph.Pipeline do
   end
 
   def init(_) do
-    {:ok, dotdash} = DotDash.start_link(self())
+    {:ok, groups_into_characters} = GroupIntoCharacters.start_link(self())
+    {:ok, dotdash} = DotDash.start_link(groups_into_characters)
     {:ok, debounce} = Debounce.start_link(dotdash)
     {:ok, _pid} = GpioKey.start_link(key_pin(), debounce)
     {:ok, {}}
