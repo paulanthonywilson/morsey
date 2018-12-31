@@ -10,7 +10,9 @@ The plan is to wire up a Raspbery Pi Zero to a telegraph key, to decode Morse an
 - [x] Wifi
 - [x] Send messages to Slack from Pi
 - [x] Send key down, key up to Slack channel
-- [ ] Send dots, dashes to slack channel
-- [ ] Distinguish letters
-- [ ] Distinguish words
+- [x] Send dots, dashes to slack channel
+- [x] Distinguish letters
+- [x] Distinguish words
 - [ ] Decode
+- [ ] Change dot timings from Slack
+- [ ] Bundle words into slack messages

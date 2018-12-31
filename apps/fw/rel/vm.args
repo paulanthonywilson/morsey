@@ -5,7 +5,7 @@
 ##  for read only filesystem.
 
 # -name fw@0.0.0.0
--setcookie lq5viarzvykdnhuwd4yofgburdt4a5fq6br2w7dcrrsv65nm2dbvxyufnh7f27pf
+-setcookie cultivate
 
 ## Use Ctrl-C to interrupt the current shell rather than invoking the emulator's
 ## break handler and possibly exiting the VM.
