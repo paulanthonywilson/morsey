@@ -8,7 +8,7 @@ defmodule Network.WifiSetup do
   """
   @callback setup_wifi(
               wifi_opts :: [key_mgmt: :"WPA-PSK" | none, ssid: String.t(), psk: String.t()]
-            ) :: {:ok, pid}
+            ) :: :ok
 
   @doc """
   Actual implementation module to use in this environment
