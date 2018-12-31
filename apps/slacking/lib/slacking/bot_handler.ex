@@ -7,10 +7,19 @@ defmodule Slacking.BotHandler do
 
   use Slack
 
+  import Slacking, only: [slack_channel: 0]
   require Logger
 
   def handle_connect(_slack, state) do
     Logger.info(fn -> "Connected to Slack" end)
+    {:ok, hostname} = :inet.gethostname()
+
+    Process.send_after(
+      self(),
+      {:send_slack_message, slack_channel(), "Connected from #{hostname}"},
+      250
+    )
+
     {:ok, state}
   end
 

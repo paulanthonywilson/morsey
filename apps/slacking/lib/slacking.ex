@@ -7,4 +7,5 @@ defmodule Slacking do
   def send_slack_message(message) do
     BotWrapper.send_slack_message(message)
   end
+  def slack_channel, do: Application.get_env(:slacking, :slack_channel)
 end

@@ -7,6 +7,8 @@ defmodule Slacking.BotWrapper do
   use GenServer
   require Logger
 
+  import Slacking, only: [slack_channel: 0]
+
   alias Slacking.BotHandler
 
   @name __MODULE__
@@ -53,5 +55,4 @@ defmodule Slacking.BotWrapper do
   end
 
   defp slack_token, do: Application.get_env(:slacking, :slack_token)
-  defp slack_channel, do: Application.get_env(:slacking, :slack_channel)
 end
