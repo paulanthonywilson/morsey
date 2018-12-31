@@ -51,7 +51,9 @@ defmodule Fw.MixProject do
       {:ring_logger, "~> 0.6"},
       {:toolshed, "~> 0.2"},
       {:slacking, in_umbrella: true},
-      {:wifi, in_umbrella: true}
+      {:wifi, in_umbrella: true},
+      {:events, in_umbrella: true},
+      {:telegraph, in_umbrella: true}
     ] ++ deps(@target)
   end
 

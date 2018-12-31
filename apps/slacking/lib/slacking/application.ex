@@ -5,7 +5,8 @@ defmodule Slacking.Application do
 
   def start(_type, _args) do
     children = [
-      Slacking.BotWrapper
+      Slacking.BotWrapper,
+      Slacking.MorseSubscriber
     ]
 
     # Not going down if we can not connect to Slack

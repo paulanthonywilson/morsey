@@ -1,9 +1,9 @@
-defmodule Slacking.MixProject do
+defmodule Telegraph.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :slacking,
+      app: :telegraph,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -17,14 +17,14 @@ defmodule Slacking.MixProject do
 
   def application do
     [
-      extra_applications: [:logger, :poison],
-      mod: {Slacking.Application, []}
+      extra_applications: [:logger],
+      mod: {Telegraph.Application, []}
     ]
   end
 
   defp deps do
     [
-      {:slack, "~> 0.15.0"},
+      {:circuits_gpio, github: "elixir-circuits/circuits_gpio"},
       {:events, in_umbrella: true}
     ]
   end
