@@ -13,7 +13,7 @@ The plan is to wire up a Raspbery Pi Zero to a telegraph key, to decode Morse an
 - [x] Send dots, dashes to slack channel
 - [x] Distinguish letters
 - [x] Distinguish words
-- [ ] Decode
+- [x] Decode
 - [ ] Change dot timings from Slack
 - [ ] Bundle words into slack messages
 

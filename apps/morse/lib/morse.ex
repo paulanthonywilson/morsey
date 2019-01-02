@@ -23,8 +23,5 @@ defmodule Morse do
   @spec decode(list(dot | dash)) :: <<_::8>>
   def decode(element)
   Definitions.decodes()
-
-  # def decode([:.]), do: "E"
-  # def decode([:., :-]), do: "A"
   def decode(_), do: "?"
 end
