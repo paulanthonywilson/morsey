@@ -4,13 +4,26 @@ defmodule Telegraph.DotDash do
   """
   use GenServer
 
-  @dot_duration_nanos 60_000_000
-  @dash_duration_nanos @dot_duration_nanos * 3
-  @character_pause_millis div(@dash_duration_nanos, 1_000_000)
-  @word_pause_nanos @dot_duration_nanos * 7
+  defstruct receiver: nil,
+            last_key_down: nil,
+            last_key_up: nil,
+            dot_nanos: nil,
+            dash_nanos: nil,
+            char_pause_millis: nil,
+            word_pause_nanos: nil
 
-  defstruct receiver: nil, last_key_down: nil, last_key_up: nil
-  @type t :: %__MODULE__{receiver: pid, last_key_down: pos_integer(), last_key_up: pos_integer()}
+  @type milliseconds :: pos_integer()
+  @type nanoseconds :: pos_integer()
+
+  @type t :: %__MODULE__{
+          receiver: pid,
+          last_key_down: nanoseconds(),
+          last_key_up: nanoseconds(),
+          dot_nanos: nanoseconds(),
+          dash_nanos: nanoseconds(),
+          char_pause_millis: milliseconds(),
+          word_pause_nanos: nanoseconds()
+        }
 
   @spec start_link(pid()) :: :ignore | {:error, any()} | {:ok, pid()}
   def start_link(receiver) do
@@ -18,7 +31,13 @@ defmodule Telegraph.DotDash do
   end
 
   def init(receiver) do
-    {:ok, %__MODULE__{receiver: receiver}}
+    Events.subscribe(:telegraph_setting_updates)
+    state = with_settings(%__MODULE__{receiver: receiver}, TelegraphSettings.config())
+    {:ok, state}
+  end
+
+  def handle_info({:telegraph_setting_updates, new_config}, s) do
+    {:noreply, with_settings(s, new_config)}
   end
 
   def handle_info({:gpio, _pin, timestamp, 1}, s = %{last_key_up: nil}) do
@@ -27,9 +46,9 @@ defmodule Telegraph.DotDash do
 
   def handle_info(
         {:gpio, _pin, timestamp, 1},
-        s = %{last_key_up: last_key_up, receiver: receiver}
+        s = %{last_key_up: last_key_up, receiver: receiver, word_pause_nanos: word_pause_nanos}
       ) do
-    if timestamp - last_key_up > word_pause_nanos() do
+    if timestamp - last_key_up > word_pause_nanos do
       send(receiver, :morse_end_of_word)
     end
 
@@ -42,15 +61,20 @@ defmodule Telegraph.DotDash do
 
   def handle_info(
         {:gpio, _pin, timestamp, 0},
-        s = %{last_key_down: last_key_down, receiver: receiver}
+        s = %{
+          last_key_down: last_key_down,
+          receiver: receiver,
+          dash_nanos: dash_nanos,
+          char_pause_millis: char_pause_millis
+        }
       ) do
-    if timestamp - last_key_down < dash_duration_nanos() do
+    if timestamp - last_key_down < dash_nanos do
       send_dot(receiver)
     else
       send_dash(receiver)
     end
 
-    {:noreply, %{s | last_key_up: timestamp}, character_pause_millis()}
+    {:noreply, %{s | last_key_up: timestamp}, char_pause_millis}
   end
 
   def handle_info(:timeout, s = %{receiver: receiver}) do
@@ -61,8 +85,12 @@ defmodule Telegraph.DotDash do
   defp send_dot(receiver), do: send(receiver, {:morse_element, :.})
   defp send_dash(receiver), do: send(receiver, {:morse_element, :-})
 
-  # defp dot_duration_nanos, do: @dot_duration_nanos
-  defp dash_duration_nanos, do: @dash_duration_nanos
-  defp character_pause_millis, do: @character_pause_millis
-  defp word_pause_nanos, do: @word_pause_nanos
+  defp with_settings(state, settings) do
+    struct!(state,
+      dot_nanos: 1_000_000 * settings.dot_millis,
+      dash_nanos: 1_000_000 * settings.dash_millis,
+      char_pause_millis: settings.char_pause_millis,
+      word_pause_nanos: 1_000_000 * settings.word_pause_millis
+    )
+  end
 end

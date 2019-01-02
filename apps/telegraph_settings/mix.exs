@@ -1,9 +1,9 @@
-defmodule Telegraph.MixProject do
+defmodule TelegraphSettings.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :telegraph,
+      app: :telegraph_settings,
       version: "0.1.0",
       build_path: "../../_build",
       config_path: "../../config/config.exs",
@@ -15,17 +15,17 @@ defmodule Telegraph.MixProject do
     ]
   end
 
+  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
-      mod: {Telegraph.Application, []}
+      mod: {TelegraphSettings.Application, []}
     ]
   end
 
+  # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:circuits_gpio, github: "elixir-circuits/circuits_gpio"},
-      {:telegraph_settings, in_umbrella: true},
       {:events, in_umbrella: true}
     ]
   end

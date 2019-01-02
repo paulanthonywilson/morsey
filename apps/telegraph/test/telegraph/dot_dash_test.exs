@@ -6,14 +6,14 @@ defmodule Telegraph.DotDashTest do
   test "dot" do
     pid = create_dot_dash()
     send(pid, gpio_message(100, 1))
-    send(pid, gpio_message(150, 0))
+    send(pid, gpio_message(100 + dash_millis() - 1, 0))
     assert_receive {:morse_element, :.}
   end
 
   test "dash" do
     pid = create_dot_dash()
     send(pid, gpio_message(100, 1))
-    send(pid, gpio_message(300, 0))
+    send(pid, gpio_message(100 + dash_millis(), 0))
     assert_receive {:morse_element, :-}
   end
 
@@ -31,27 +31,33 @@ defmodule Telegraph.DotDashTest do
 
   test "end of character" do
     pid = create_dot_dash()
+    send(pid, gpio_message(10, 1))
+    send(pid, gpio_message(20, 0))
+    send(pid, gpio_message(30, 1))
+    send(pid, gpio_message(40, 0))
     send(pid, gpio_message(50, 1))
-    send(pid, gpio_message(100, 0))
-    send(pid, gpio_message(150, 1))
-    send(pid, gpio_message(200, 0))
-    send(pid, gpio_message(250, 1))
-    send(pid, gpio_message(300, 0))
+    send(pid, gpio_message(60, 0))
 
     assert_receive {:morse_element, :.}
     assert_receive {:morse_element, :.}
     assert_receive {:morse_element, :.}
-    assert_receive :morse_end_of_character, 500
+    assert_receive :morse_end_of_character, TelegraphSettings.config().char_pause_millis() + 100
   end
 
   test "end of word" do
     pid = create_dot_dash()
-    send(pid, gpio_message(50, 1))
-    send(pid, gpio_message(100, 0))
+    send(pid, gpio_message(10, 1))
+    send(pid, gpio_message(20, 0))
     assert_receive {:morse_element, :.}
 
-    send(pid, gpio_message(600, 1))
+    send(pid, gpio_message(TelegraphSettings.config().word_pause_millis() + 21, 1))
     assert_receive :morse_end_of_word
+  end
+
+  test "update settings" do
+    pid = create_dot_dash()
+    send(pid, {:telegraph_setting_updates, %TelegraphSettings{dot_millis: 30}})
+    assert :sys.get_state(pid).dot_nanos == 30_000_000
   end
 
   defp create_dot_dash do
@@ -61,5 +67,9 @@ defmodule Telegraph.DotDashTest do
 
   defp gpio_message(millis, value) do
     {:gpio, 21, millis * 1_000_000, value}
+  end
+
+  defp dash_millis() do
+    TelegraphSettings.config().dash_millis
   end
 end
