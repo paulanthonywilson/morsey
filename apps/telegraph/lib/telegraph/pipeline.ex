@@ -21,6 +21,12 @@ defmodule Telegraph.Pipeline do
     {:ok, {}}
   end
 
+  def handle_info({:morse_character, dotdash}, s) do
+    character = Morse.decode(dotdash)
+    Events.broadcast(:morse, character)
+    {:noreply, s}
+  end
+
   def handle_info(msg, s) do
     Events.broadcast(:morse, msg)
     {:noreply, s}

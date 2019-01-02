@@ -16,3 +16,9 @@ The plan is to wire up a Raspbery Pi Zero to a telegraph key, to decode Morse an
 - [ ] Decode
 - [ ] Change dot timings from Slack
 - [ ] Bundle words into slack messages
+
+## Morse
+
+From https://en.wikipedia.org/wiki/Morse_code#/media/File:International_Morse_Code.svg
+
+![ITU Morse](morse.png)
