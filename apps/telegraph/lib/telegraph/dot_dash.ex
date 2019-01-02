@@ -9,8 +9,7 @@ defmodule Telegraph.DotDash do
             last_key_up: nil,
             dot_nanos: nil,
             dash_nanos: nil,
-            char_pause_millis: nil,
-            word_pause_nanos: nil
+            char_pause_millis: nil
 
   @type milliseconds :: pos_integer()
   @type nanoseconds :: pos_integer()
@@ -22,7 +21,6 @@ defmodule Telegraph.DotDash do
           dot_nanos: nanoseconds(),
           dash_nanos: nanoseconds(),
           char_pause_millis: milliseconds(),
-          word_pause_nanos: nanoseconds()
         }
 
   @spec start_link(pid()) :: :ignore | {:error, any()} | {:ok, pid()}
@@ -40,18 +38,7 @@ defmodule Telegraph.DotDash do
     {:noreply, with_settings(s, new_config)}
   end
 
-  def handle_info({:gpio, _pin, timestamp, 1}, s = %{last_key_up: nil}) do
-    {:noreply, %{s | last_key_down: timestamp}}
-  end
-
-  def handle_info(
-        {:gpio, _pin, timestamp, 1},
-        s = %{last_key_up: last_key_up, receiver: receiver, word_pause_nanos: word_pause_nanos}
-      ) do
-    if timestamp - last_key_up > word_pause_nanos do
-      send(receiver, :morse_end_of_word)
-    end
-
+  def handle_info({:gpio, _pin, timestamp, 1}, s) do
     {:noreply, %{s | last_key_down: timestamp}}
   end
 
@@ -89,8 +76,7 @@ defmodule Telegraph.DotDash do
     struct!(state,
       dot_nanos: 1_000_000 * settings.dot_millis,
       dash_nanos: 1_000_000 * settings.dash_millis,
-      char_pause_millis: settings.char_pause_millis,
-      word_pause_nanos: 1_000_000 * settings.word_pause_millis
+      char_pause_millis: settings.char_pause_millis
     )
   end
 end

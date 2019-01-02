@@ -5,7 +5,7 @@ defmodule Telegraph.Pipeline do
   """
   use GenServer
 
-  alias Telegraph.{GpioKey, Debounce, DotDash, GroupIntoCharacters}
+  alias Telegraph.{GpioKey, Debounce, DotDash, GroupIntoCharacters, MorseDecode}
 
   @name __MODULE__
 
@@ -14,15 +14,15 @@ defmodule Telegraph.Pipeline do
   end
 
   def init(_) do
-    {:ok, groups_into_characters} = GroupIntoCharacters.start_link(self())
+    {:ok, morse_decode} = MorseDecode.start_link(self())
+    {:ok, groups_into_characters} = GroupIntoCharacters.start_link(morse_decode)
     {:ok, dotdash} = DotDash.start_link(groups_into_characters)
     {:ok, debounce} = Debounce.start_link(dotdash)
     {:ok, _pid} = GpioKey.start_link(key_pin(), debounce)
     {:ok, {}}
   end
 
-  def handle_info({:morse_character, dotdash}, s) do
-    character = Morse.decode(dotdash)
+  def handle_info({:telegraph_character, character}, s) do
     Events.broadcast(:morse, character)
     {:noreply, s}
   end

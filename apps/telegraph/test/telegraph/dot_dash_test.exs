@@ -42,16 +42,8 @@ defmodule Telegraph.DotDashTest do
     assert_receive {:morse_element, :.}
     assert_receive {:morse_element, :.}
     assert_receive :morse_end_of_character, TelegraphSettings.config().char_pause_millis() + 100
-  end
 
-  test "end of word" do
-    pid = create_dot_dash()
-    send(pid, gpio_message(10, 1))
-    send(pid, gpio_message(20, 0))
-    assert_receive {:morse_element, :.}
-
-    send(pid, gpio_message(TelegraphSettings.config().word_pause_millis() + 21, 1))
-    assert_receive :morse_end_of_word
+    refute_receive _
   end
 
   test "update settings" do
