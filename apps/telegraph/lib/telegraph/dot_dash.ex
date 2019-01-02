@@ -20,7 +20,7 @@ defmodule Telegraph.DotDash do
           last_key_up: nanoseconds(),
           dot_nanos: nanoseconds(),
           dash_nanos: nanoseconds(),
-          char_pause_millis: milliseconds(),
+          char_pause_millis: milliseconds()
         }
 
   @spec start_link(pid()) :: :ignore | {:error, any()} | {:ok, pid()}
@@ -66,6 +66,11 @@ defmodule Telegraph.DotDash do
 
   def handle_info(:timeout, s = %{receiver: receiver}) do
     send(receiver, :morse_end_of_character)
+    {:noreply, s}
+  end
+
+  def handle_info(msg, s = %{receiver: receiver}) do
+    send(receiver, msg)
     {:noreply, s}
   end
 

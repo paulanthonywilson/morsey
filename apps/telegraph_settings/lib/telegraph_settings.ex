@@ -47,6 +47,10 @@ defmodule TelegraphSettings do
     update_values(file, word_pause_millis: value)
   end
 
+  def reset_defaults(file \\ @settings_file) do
+    File.rm(file)
+  end
+
   defp update_values(file, updates) do
     current = config(file)
     updated = struct(current, updates)

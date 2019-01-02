@@ -48,8 +48,14 @@ defmodule Telegraph.DotDashTest do
 
   test "update settings" do
     pid = create_dot_dash()
-    send(pid, {:telegraph_setting_updates, %TelegraphSettings{dot_millis: 30}})
+    Events.broadcast(:telegraph_setting_updates, %TelegraphSettings{dot_millis: 30})
     assert :sys.get_state(pid).dot_nanos == 30_000_000
+  end
+
+  test "sends through end of word" do
+    pid = create_dot_dash()
+    send(pid, :morse_end_of_word)
+    assert_receive :morse_end_of_word
   end
 
   defp create_dot_dash do
