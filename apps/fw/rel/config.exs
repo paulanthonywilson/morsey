@@ -29,4 +29,5 @@ release :fw do
   set(version: current_version(:fw))
   plugin(Nerves)
   plugin(Shoehorn)
+  set(vm_args: "rel/vm.args")
 end

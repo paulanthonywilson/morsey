@@ -12,8 +12,18 @@ defmodule Telegraph.Debounce do
 
   @debounce_time 40
 
-  defstruct receiver: nil, last_message: nil
-  @type t :: %__MODULE__{receiver: pid, last_message: any()}
+  @type pin :: non_neg_integer()
+  @type timestamp :: non_neg_integer()
+  @type pin_state :: 0 | 1
+  @type gpio_message :: {:gpio, pin, timestamp, pin_state}
+
+  defstruct receiver: nil, last_message: nil, first_timestamp: nil
+
+  @type t :: %__MODULE__{
+          receiver: pid,
+          last_message: gpio_message(),
+          first_timestamp: timestamp()
+        }
 
   @doc """
   Pass in the pid that receives events
@@ -27,13 +37,20 @@ defmodule Telegraph.Debounce do
     {:ok, %__MODULE__{receiver: receiver}}
   end
 
-  def handle_info(:timeout, s) do
-    %{receiver: receiver, last_message: message} = s
-    send(receiver, message)
-    {:noreply, s}
+  def handle_info(
+        :timeout,
+        s = %{receiver: receiver, last_message: last_message, first_timestamp: timestamp}
+      ) do
+    {:gpio, pin, _, pin_state} = last_message
+    send(receiver, {:gpio, pin, timestamp, pin_state})
+    {:noreply, %{s | last_message: nil, first_timestamp: nil}}
   end
-  def handle_info(message, s) do
 
+  def handle_info(message = {_, _, timestamp, _}, s = %{first_timestamp: nil}) do
+    {:noreply, %{s | last_message: message, first_timestamp: timestamp}, @debounce_time}
+  end
+
+  def handle_info(message, s) do
     {:noreply, %{s | last_message: message}, @debounce_time}
   end
 end

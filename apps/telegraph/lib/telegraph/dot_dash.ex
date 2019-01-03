@@ -3,6 +3,7 @@ defmodule Telegraph.DotDash do
   Takes GPIO key up / key down messsages and converts them to dot dash
   """
   use GenServer
+  require Logger
 
   defstruct receiver: nil,
             last_key_down: nil,
@@ -39,6 +40,17 @@ defmodule Telegraph.DotDash do
   end
 
   def handle_info({:gpio, _pin, timestamp, 1}, s) do
+    Logger.debug(fn ->
+      %{last_key_up: key_up} = s
+
+      if key_up do
+        key_up_for = timestamp - key_up
+        "Key up for: #{key_up_for / 1_000_000} ms"
+      else
+        "First key down"
+      end
+    end)
+
     {:noreply, %{s | last_key_down: timestamp}}
   end
 
@@ -55,7 +67,10 @@ defmodule Telegraph.DotDash do
           char_pause_millis: char_pause_millis
         }
       ) do
-    if timestamp - last_key_down < dash_nanos do
+    key_down_for = timestamp - last_key_down
+    Logger.debug(fn -> "Key down for: #{key_down_for / 1_000_000} ms" end)
+
+    if key_down_for < dash_nanos do
       send_dot(receiver)
     else
       send_dash(receiver)

@@ -49,6 +49,7 @@ defmodule TelegraphSettings do
 
   def reset_defaults(file \\ @settings_file) do
     File.rm(file)
+    Events.broadcast(:telegraph_setting_updates, config(file))
   end
 
   defp update_values(file, updates) do
